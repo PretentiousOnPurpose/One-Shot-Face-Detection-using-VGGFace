@@ -1,17 +1,18 @@
 import tensorflow as tf
 import numpy as np
 import keras
-from keras.models import Model, Sequential, load_model
+from keras.models import Model, Sequential
 from keras.layers import BatchNormalization, Conv2D, Activation, MaxPooling2D
 
-NUM_Class = 1+1 # One for face and other for Background
-NUM_Anchors = 5
+NUM_CLASS = 1+1 # One for Object (Face)  and other for Background
+# NUM_ANCHORS = 5
 
 def ssd(input_dims):
-    vgg_base = keras.applications.VGG16(include_top=False, input_shape=(input_dims, input_dims, 3), classes=2)
+    vgg_base = keras.applications.VGG16(include_top=False, input_shape=(input_dims, input_dims, 3), classes=NUM_CLASS)
     model = Model(inputs=vgg_base.input, outputs=vgg_base.get_layer(index=13).output)
     ssd = Sequential()
     ssd.add(model)
+    # Scale 0 Prediction
     ssd.add(Conv2D(filters=1024, kernel_size=3, padding='same'))
     ssd.add(BatchNormalization())
     ssd.add(Activation('relu'))
@@ -59,6 +60,7 @@ def ssd(input_dims):
     ssd.add(BatchNormalization())
     ssd.add(Activation('relu'))
     ssd.add(MaxPooling2D(2))
+    # Scale 6 Prediction
 
     return ssd
 
