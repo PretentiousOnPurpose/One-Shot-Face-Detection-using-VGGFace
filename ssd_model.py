@@ -10,6 +10,8 @@ NUM_CLASS = 1+1 # One for Object (Face)  and other for Background
 def ssd(input_dims):
     vgg_base = keras.applications.VGG16(include_top=False, input_shape=(input_dims, input_dims, 3), classes=NUM_CLASS)
     model = Model(inputs=vgg_base.input, outputs=vgg_base.get_layer(index=13).output)
+    for l in model.layers:
+        l.trainable = False
     ssd = Sequential()
     ssd.add(model)
     # Scale 0 Prediction
