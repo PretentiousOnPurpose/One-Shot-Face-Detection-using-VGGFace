@@ -1,34 +1,47 @@
-import os
 import glob
-import keras
-import mxnet as mx
 import numpy as np
-from PIL import Image
-import tensorflow as tf
-from keras.models import Model
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-from ssd_model import ssd, class_pred, box_pred
-from mxnet.contrib.ndarray import MultiBoxDetection
-from bbox_utils import default_boxes, box_to_rect, plot_boxes
+from ssd_model import SSD
+from bbox_utils import default_boxes
+from keras.models import Sequential
+from keras.layers import Conv2D
 
-EPOCHS = 40
+imgs = np.load("imgs.npy")
+labels = np.load("labels.npy")
 
-SSD = ssd(300)
+model = SSD()
 
-imgs = glob.glob("data/*.jpg")
-data = np.array([np.array(Image.open(img)) for img in imgs])
+s0 = Sequential()
+s0.add(model.get_layer(index=13))
+s0.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
 
-for e in range(EPOCHS):
-    for img in data:
-        s0 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=0).output)(img)
-        s1 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=7).output)(img)
-        s2 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=14).output)(img)
-        s3 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=21).output)(img)
-        s4 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=28).output)(img)
-        s5 = Model(inputs=SSD.inputs, outputs=SSD.get_layer(index=35).output)(img)
-        s6 = SSD.predict(img)
+s1 = Sequential()
+s1.add(model.get_layer(index=19))
+s1.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
 
-        boxes = box_pred
+s2 = Sequential()
+s2.add(model.get_layer(index=26))
+s2.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
 
-        
+s3 = Sequential()
+s3.add(model.get_layer(index=33))
+s3.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
 
+s4 = Sequential()
+s4.add(model.get_layer(index=40))
+s4.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
+
+s5 = Sequential()
+s5.add(model.get_layer(index=42))
+s5.add(Conv2D(filters=5, kernel_size=3, strides=1, padding='same'))
+
+def NMS_S1():
+    pass
+
+def NMS_S2():
+    pass
+
+def train(epochs = 50):
+    pass
+
+print(imgs[1])
+print(labels[1])

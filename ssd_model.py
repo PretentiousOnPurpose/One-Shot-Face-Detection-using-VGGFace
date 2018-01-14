@@ -1,74 +1,48 @@
-import tensorflow as tf
-import numpy as np
-import keras
+from keras_vggface.vggface import VGGFace
 from keras.models import Model, Sequential
-from keras.layers import BatchNormalization, Conv2D, Activation, MaxPooling2D
+from keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, AveragePooling2D
 
-NUM_CLASS = 1+1 # One for Object (Face)  and other for Background
-# NUM_ANCHORS = 5
+def SSD():
+    vgg = VGGFace(include_top=False, input_shape=(300, 400, 3))
+    for layer in vgg.layers:
+        layer.trainable = False
 
-def ssd(input_dims):
-    vgg_base = keras.applications.VGG16(include_top=False, input_shape=(input_dims, input_dims, 3), classes=NUM_CLASS)
-    model = Model(inputs=vgg_base.input, outputs=vgg_base.get_layer(index=13).output)
-    for l in model.layers:
-        l.trainable = False
-    ssd = Sequential()
-    ssd.add(model)
-    # Scale 0 Prediction
-    ssd.add(Conv2D(filters=1024, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=1024, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(2))
-    # Scale 1 Prediction
-    ssd.add(Conv2D(filters=1024, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=1024, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(1))
-    # Scale 2 Prediction
-    ssd.add(Conv2D(filters=512, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=512, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(2))
-    # Scale 3 Prediction
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(2))
-    # Scale 4 Prediction
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(2))
-    # Scale 5 Prediction
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(Conv2D(filters=256, kernel_size=3, padding='same'))
-    ssd.add(BatchNormalization())
-    ssd.add(Activation('relu'))
-    ssd.add(MaxPooling2D(2))
-    # Scale 6 Prediction
+    ssd = Model(inputs=vgg.inputs, outputs=vgg.get_layer(index=13).output)
+    model = Sequential()
+    model.add(ssd)
 
-    return ssd
+    model.add(Conv2D(filters=1024, kernel_size=3, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Conv2D(filters=1024, kernel_size=1, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(MaxPool2D(pool_size=2, strides=2))
 
-def class_pred(feat):
-    return Conv2D(filters=10, kernel_size=3, padding='same')
+    model.add(Conv2D(filters=256, kernel_size=1, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Conv2D(filters=512, kernel_size=3, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(MaxPool2D(pool_size=2, strides=2))
 
-def box_pred(feat):
-    return Conv2D(filters=20, kernel_size=3, padding='same')
+    model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(MaxPool2D(pool_size=2, strides=2))
 
+    model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(MaxPool2D(pool_size=2, strides=2))
+
+    model.add(AveragePooling2D(strides=2))
+
+    return model
