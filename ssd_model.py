@@ -27,22 +27,22 @@ def SSD():
     model.add(Activation('relu'))
     model.add(MaxPool2D(pool_size=2, strides=2))
 
-    model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(MaxPool2D(pool_size=2, strides=2))
-
-    model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(MaxPool2D(pool_size=2, strides=2))
-
-    model.add(AveragePooling2D(strides=2))
+    # model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(MaxPool2D(pool_size=2, strides=2))
+    #
+    # model.add(Conv2D(filters=128, kernel_size=1, strides=1, padding='same'))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(Conv2D(filters=256, kernel_size=3, strides=1, padding='same'))
+    # model.add(BatchNormalization())
+    # model.add(Activation('relu'))
+    # model.add(MaxPool2D(pool_size=2, strides=2))
+    #
+    # model.add(AveragePooling2D(strides=2))
 
     return model
