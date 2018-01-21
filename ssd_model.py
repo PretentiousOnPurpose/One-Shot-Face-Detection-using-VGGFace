@@ -1,6 +1,9 @@
 from keras_vggface.vggface import VGGFace
 from keras.models import Model, Sequential
 from keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, AveragePooling2D
+from PIL import Image
+import numpy as np
+
 
 def SSD():
     vgg = VGGFace(include_top=False, input_shape=(375, 500, 3))
@@ -8,6 +11,8 @@ def SSD():
         layer.trainable = False
 
     ssd = Model(inputs=vgg.inputs, outputs=vgg.get_layer(index=13).output)
+    for layer in ssd.layers:
+        layer.trainable = False
     model = Sequential()
     model.add(ssd)
 
