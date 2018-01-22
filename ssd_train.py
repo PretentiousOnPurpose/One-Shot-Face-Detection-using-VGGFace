@@ -1,7 +1,5 @@
-import glob
 import keras
 import numpy as np
-from ssd_model import SSD
 from PIL import Image
 import keras.backend as K
 from keras.models import Sequential
@@ -9,7 +7,7 @@ from keras.layers import Conv2D
 from misc import load_data
 from keras_vggface.vggface import VGGFace
 from keras.models import Model, Sequential
-from keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, AveragePooling2D
+from keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D
 
 data = load_data()
 
@@ -88,24 +86,30 @@ def relu(X):
     return K.maximum(X, 0)
 
 def loss(Y, y_):
-    if Y.get_shape().as_list() != y_.get_shape().as_list():
+    print(Y.shape.as_list())
+    print(y_.shape.as_list())
+    if Y.shape.as_list() != y_.shape.as_list():
+        print("Clicked")
         Y = K.zeros_like(y_)
-    softMax = -(Y[:, 0] * K.log(sigmoid(y_[:, 0])) + ((1 - Y[:, 0]) * K.log(sigmoid(1 - y_[:, 0]))))
-    mse = keras.losses.mean_squared_error(Y[:, 1:], relu(y_[:, 1:]))
-    return softMax + mse
-
+    # softMax = -(Y[:, 0] * K.log(sigmoid(y_[:, 0])) + ((1 - Y[:, 0]) * K.log(sigmoid(1 - y_[:, 0]))))
+    # mse = keras.losses.mean_squared_error(Y[:, 1:], relu(y_[:, 1:]))
+    # return softMax + mse
+    return 1.0
 y_ = NMS(p1, p2, p3, p4)
 
 Loss = loss(Y, y_)
-opt = K.tf.train.AdamOptimizer(learning_rate=0.05)
-train_ = opt.minimize(Loss)
+# opt = K.tf.train.AdamOptimizer(learning_rate=0.05)
+# train_ = opt.minimize(Loss)
 sess.run(K.tf.global_variables_initializer())
+h = sess.run(y_, feed_dict={X: np.array(Image.open("x.jpg")).reshape((1, 375, 500, 3))})
+print(h.shape)
+
 
 def train(epochs = 100):
     for e in range(epochs):
         for i, d in enumerate(data):
-            _, L = sess.run([train_, Loss], feed_dict={X: d[0].reshape((1, 375, 500, 3)), Y: d[1].reshape((-1, 5))})
+            _, L = sess.run([train_, Loss], feed_dict={X: np.array(Image.open("x.jpg")).reshape((1, 375, 500, 3)), Y: d[1].reshape((-1, 5))})
             if e % 10 == 0:
                 print("epoch {} , loss {}".format(e, L))
 
-train(epochs = 1)
+# train(epochs = 1)
